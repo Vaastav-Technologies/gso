@@ -2,8 +2,6 @@
 
 `RedStdErr`: Colour stderr red ❤️, to differentiate stdout and stderr, .. and much more ..
 
-# RedStdErr (rse)
-
 `RedStdErr` is a collection of utilities that helps you distinguish **stderr** from **stdout** in your command outputs. It can either colorize stderr in red ❤️, or prefix output lines with labels (`STDOUT:` / `STDERR:`). This makes it easier to debug scripts and commands where both streams are mixed.
 
 ---
@@ -36,7 +34,7 @@ Then reload your shell or run `source ~/.bashrc`.
 ```bash
 rse command args...                 # stderr in red, stdout normal
 rse -h | --help                     # print help
-rse -l | --label command args...    # prefix with STDOUT:/STDERR:
+rse -l | --label command args...    # prefix with OUT:/ERR:, useful when colorised output is not desired but still output differentiation is needed.
 rse -q | --quiet-exit command args  # suppress [RSE] exit code print
 rse -lq | -ql                       # combine both options
 ```
