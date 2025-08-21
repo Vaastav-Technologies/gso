@@ -9,7 +9,7 @@ Run a command with colored/labeled stderr
 usage:
     rse command args...               	# stderr in red, stdout normal
     rse -h, --help                    	# print help and exit
-    rse -l, --label command args...   	# prefix STDOUT:/STDERR: labels. Can be used when the run command introduces its own colours to stdout/stderr
+    rse -l, --label command args...   	# prefix OUT:/ERR: labels. Can be used when the run command introduces its own colours to stdout/stderr
     rse -q, --quiet-exit              	# suppress [RSE] exit code print
     rse -lq, -ql, --label --quiet-exit 	# combine both
 examples:
@@ -78,8 +78,8 @@ RSE_HELP_EOF
     (
         if $label; then
             "$@" \
-                > >(sed 's/^/STDOUT: /') \
-                2> >(sed 's/^/STDERR: /' >&2)
+                > >(sed 's/^/OUT: /') \
+                2> >(sed 's/^/ERR: /' >&2)
         else
             "$@" \
                 > >(cat) \

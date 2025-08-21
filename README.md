@@ -2,14 +2,14 @@
 
 `RedStdErr`: Colour stderr red ❤️, to differentiate stdout and stderr, .. and much more ..
 
-`RedStdErr` is a collection of utilities that helps you distinguish **stderr** from **stdout** in your command outputs. It can either colorize stderr in red ❤️, or prefix output lines with labels (`STDOUT:` / `STDERR:`). This makes it easier to debug scripts and commands where both streams are mixed.
+`RedStdErr` is a collection of utilities that helps you distinguish **stderr** from **stdout** in your command outputs. It can either colorize stderr in red ❤️, or prefix output lines with labels (`OUT:` / `ERR:`). This makes it easier to debug scripts and commands where both streams are mixed.
 
 ---
 
 ## Features
 
 * 🔴 **Colorized stderr** by default (stderr shown in red, stdout unchanged)
-* 🏷 **Label mode** with `STDOUT:` and `STDERR:` prefixes (useful if the command already uses colors)
+* 🏷 **Label mode** with `OUT:` and `ERR:` prefixes (useful if the command already uses colors)
 * � **Exit code reporting**, always displayed at the end.
 * 🤫 Optionally suppress the exit code line with `-q`
 * 🎨 Markdown export option planned (`-c`, `--copy`) for documentation workflows
@@ -57,7 +57,7 @@ $ rse ls /doesnotexist
 $ rse -l ls /doesnotexist
 ```
 ```terminaloutput
-STDERR: ls: cannot access '/doesnotexist': No such file or directory
+ERR: ls: cannot access '/doesnotexist': No such file or directory
 [RSE] exit code: 2
 ```
 
