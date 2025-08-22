@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 function rse() {
-    set -u
 	function rse_usage_help() {
 		echo -e "rse: RedStdErr" >&2
 		echo -e "Run a command with colored/labeled/markdown stderr" >&2
@@ -31,56 +30,66 @@ function rse() {
 
     local label=false
     local quiet_exit=false
-
-    # First, translate long options into short ones
-    local args=()
-    for arg in "$@"; do
-        case "$arg" in
-            --help) args+=(-h) ;;
-            --label) args+=(-l) ;;
-            --quiet-exit) args+=(-q) ;;
-            --) args+=(--) ;;   # end of options
-            --*) echo "rse: unknown option $arg" >&2; return 2 ;;
-            *) args+=("$arg") ;;
-        esac
-    done
+    local markdown=false
 
     # Reset OPTIND for getopts
     OPTIND=1
 
-    # Parse short options (including clusters like -lq)
-    while getopts ":hlq" opt "${args[@]}"; do
+    # Parse short options (clusters supported)
+    while getopts ":hlqm" opt; do
         case $opt in
-            h)	rse_usage_help
-                return 0
-                ;;
+            h)  rse_usage_help
+                return 0 ;;
             l) label=true ;;
             q) quiet_exit=true ;;
-            \?)
-                echo "rse: unknown option -$OPTARG" >&2
-                return 2
-                ;;
+            m) markdown=true ;;
+            \?) echo "rse: unknown option -$OPTARG" >&2; return 2 ;;
         esac
     done
     shift $((OPTIND -1))
 
-    # Run command in subshell so we can capture exit code
-    (
-        if $label; then
-            "$@" \
+    # Mutually exclusive check
+    if $label && $markdown; then
+        echo "rse: -l and -m cannot be used together" >&2
+        return 2
+    fi
+
+    local status=0
+
+    if $markdown; then
+        # Emit everything to a single stream (stderr) so <pre> wraps consistently
+        echo "<pre>" >&2
+        (
+            stdbuf -o0 -e0 "$@" \
+            > >(sed 's|.*|<span>&</span>|' >&2) \
+            2> >(sed 's|.*|<span style="color:red">&</span>|' >&2)
+        )
+        status=$?
+        wait
+        if ! $quiet_exit; then
+            echo "<span style=\"color:red\">[RSE]</span> exit code: $status" >&2
+        fi
+        echo "</pre>" >&2
+
+    else
+        (
+            if $label; then
+                # Label mode: keep streams separate; stdout stays stdout, stderr stays stderr
+                stdbuf -oL -eL "$@" \
                 > >(sed 's/^/OUT: /') \
                 2> >(sed 's/^/ERR: /' >&2)
-        else
-            "$@" \
-                > >(cat) \
-                2> >(sed -e "s/^\(.*\)$/$(echo -en '\033[31;1m')\1$(echo -en '\033[0m')/" >&2)
-        fi
-    )
-    local status=$?
+            else
+                # Base case: color stderr red with descriptor swap to preserve stderr
+                ( "$@" 3>&1 1>&2 2>&3 \
+                | sed -e "s/^.*$/$(echo -en '\033[31;1m')&$(echo -en '\033[0m')/" >&2 ) 3>&1 1>&2 2>&3 \
+                | cat
+            fi
+        )
+        status=$?
 
-    if ! $quiet_exit; then
-		wait
-        echo -e "\033[1;31m[RSE]\033[0m exit code: $status" >&2
+        if ! $quiet_exit; then
+            echo -e "\033[31;1m[RSE]\033[0m exit code: $status" >&2
+        fi
     fi
 
     return $status
