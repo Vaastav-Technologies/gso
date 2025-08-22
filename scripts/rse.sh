@@ -3,40 +3,30 @@
 function rse() {
     set -u
 	function rse_usage_help() {
-		cat << RSE_HELP_EOF >&2
-rse: RedStdErr
-Run a command with colored/labeled stderr
-usage:
-    rse command args...               	# stderr in red, stdout normal
-    rse -h, --help                    	# print help and exit
-    rse -l, --label command args...   	# prefix OUT:/ERR: labels. Can be used when the run command introduces its own colours to stdout/stderr
-    rse -q, --quiet-exit              	# suppress [RSE] exit code print
-    rse -lq, -ql, --label --quiet-exit 	# combine both
-examples:
-	# just run a command with rse
-	$ rse ls /onefiledir
-	onefile
-
-	# Have rse produce a red-colored stderr output
-	$ rse ls /doesnotexist
-RSE_HELP_EOF
-	echo -e "\t\033[1;31mls: cannot access '/doesnotexist': No such file or directory\033[0m" >&2 # coloured in red
-	cat << RSE_HELP_EOF >&2
-	[RSE] exit code: 2
-
-	# No need to colour stderr, only label it (and stdout)
-	$ rse -l ls /doesnotexist
-	STDERR: ls: cannot access '/doesnotexist': No such file or directory
-	[RSE] exit code: 2
-
-	# Only label stderr and do not print the exit code
-	$ rse -q ls /doesnotexist
-	STDERR: ls: cannot access '/doesnotexist': No such file or directory
-	# no exit code displayed
-	$ $? # exit code queried
-	bash: 2: command not found
-
-RSE_HELP_EOF
+		echo -e "rse: RedStdErr" >&2
+		echo -e "Run a command with colored/labeled/markdown stderr" >&2
+		echo -e "usage:" >&2
+		echo -e "    rse command args...                # stderr in red, stdout normal" >&2
+		echo -e "    rse -h                             # print help and exit" >&2
+		echo -e "    rse -l command args...             # prefix OUT:/ERR: labels, useful when colorised output is not desired but still output differentiation is needed." >&2
+		echo -e "    rse -q                             # suppress \033[31;1m[RSE]\033[0m exit code print" >&2
+		echo -e "    rse -m command args...             # output formatted in markdown (HTML spans)" >&2
+		echo -e "" >&2
+		echo -e "options:" >&2
+		echo -e "    -l and -m are mutually exclusive" >&2
+		echo -e "" >&2
+		echo -e "examples:" >&2
+		echo -e "    $ rse ls /doesnotexist" >&2
+		echo -e "    \033[31;1mls: cannot access '/doesnotexist': No such file or directory\033[0m" >&2
+		echo -e "    \033[31;1m[RSE]\033[0m exit code: 2" >&2
+		echo -e "" >&2
+		echo -e "    $ rse -l ls /doesnotexist" >&2
+		echo -e "    ERR: ls: cannot access '/doesnotexist': No such file or directory" >&2
+		echo -e "    \033[31;1m[RSE]\033[0m exit code: 2" >&2
+		echo -e "" >&2
+		echo -e "    $ rse -m ls /doesnotexist" >&2
+		echo -e "    <span style=\"color:red\">ls: cannot access '/doesnotexist': No such file or directory</span><br>" >&2
+		echo -e "    <span style=\"color:red\">[RSE]</span> exit code: 2" >&2
 	}
 
     local label=false
