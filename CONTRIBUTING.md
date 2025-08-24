@@ -10,7 +10,7 @@ This project is a collection of Bash utilities that help people experiment with 
 
 ### Reporting Issues
 
-* Use the [issue tracker](./issues) to report bugs or suggest enhancements.
+* Use the [issue tracker](https://github.com/Vaastav-Technologies/gso/issues) to report bugs or suggest enhancements.
 * Please include clear steps to reproduce bugs.
 * Share environment details (OS, Bash version).
 
