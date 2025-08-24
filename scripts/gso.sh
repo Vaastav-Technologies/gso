@@ -92,15 +92,13 @@ function gso() {
     echo "</pre>" >&2
 
   else
-    (
-      if $label; then
-        # Label mode: keep streams separate; stdout stays stdout, stderr stays stderr
-        "$@" | sed 's/^/OUT: /'
-      else
-        # Base case: color stdout green
-        "$@" | sed -e "s/^.*$/$(echo -en '\033[32;1m')&$(echo -en '\033[0m')/"
-      fi
-    )
+    if $label; then
+      # Label mode: keep streams separate; stdout stays stdout, stderr stays stderr
+      "$@" | sed 's/^/OUT: /'
+    else
+      # Base case: color stdout green
+      "$@" | sed -e "s/^.*$/$(echo -en '\033[32;1m')&$(echo -en '\033[0m')/"
+    fi
     status=$?
 
     if ! $quiet_exit; then
