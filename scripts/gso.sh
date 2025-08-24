@@ -1,6 +1,42 @@
 #!/usr/bin/env bash
 
+function _gso() {
+  # Helper function for gso()
+  local label=$1
+  local markdown=$2
+  local quiet_exit=$3
+  shift 3
+
+  local status=0
+
+  if $markdown; then
+    echo "<pre>" >&2
+    "$@" | sed 's|.*|<span style=\"color:green\">&</span>|'
+    status=${PIPESTATUS[0]}
+    if ! $quiet_exit; then
+      echo "<span style=\"color:red\">[GSO]</span> exit code: $status" >&2
+    fi
+    echo "</pre>" >&2
+
+  else
+    if $label; then
+      "$@" | sed 's/^/OUT: /'
+      status=${PIPESTATUS[0]}
+    else
+      "$@" | sed -e "s/^.*$/$(echo -en '\033[32;1m')&$(echo -en '\033[0m')/"
+      status=${PIPESTATUS[0]}
+    fi
+
+    if ! $quiet_exit; then
+      echo -e "\033[31;1m[GSO]\033[0m exit code: $status" >&2
+    fi
+  fi
+
+  return $status
+}
+
 function gso() {
+  # Main gso command function
 	function gso_usage_help() {
 		echo -e "gso: GreenStdOut" >&2
 		echo -e "Run a command with colored/labeled/markdown stdout." >&2
@@ -76,10 +112,10 @@ function gso() {
   fi
 
   # Resolve mode: CLI flags override env-vars
-  if $env_label; then 
+  if $env_label && ! $sh_md && ! $sh_label; then 
     label=true
     markdown=false
-  elif $env_md; then
+  elif $env_md && ! $sh_label && ! $sh_md; then
     label=false
     markdown=true
   fi
@@ -92,32 +128,6 @@ function gso() {
     markdown=true
   fi
 
-  local status=0
-
-  if $markdown; then
-    echo "<pre>" >&2
-    "$@" | sed 's|.*|<span style=\"color:green\">&</span>|'
-    status=${PIPESTATUS[0]}
-    if ! $quiet_exit; then
-      echo "<span></span>" >&2
-      echo "<span style=\"color:red\">[GSO]</span> exit code: $status" >&2
-    fi
-    echo "</pre>" >&2
-
-  else
-    if $label; then
-      # Label mode: keep streams separate; stdout stays stdout, stderr stays stderr
-      "$@" | sed 's/^/OUT: /'
-    else
-      # Base case: color stdout green
-      "$@" | sed -e "s/^.*$/$(echo -en '\033[32;1m')&$(echo -en '\033[0m')/"
-    fi
-    status=${PIPESTATUS[0]}
-
-    if ! $quiet_exit; then
-      echo -e "\033[31;1m[GSO]\033[0m exit code: $status" >&2
-    fi
-  fi
-
-  return $status
+  _gso "$label" "$markdown" "$quiet_exit" "$@"
+  return $?
 }
