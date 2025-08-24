@@ -76,8 +76,21 @@ function gso() {
   fi
 
   # Resolve mode: CLI flags override env-vars
-  if $sh_label || $env_label; then label=true; fi
-  if $sh_md    || $env_md;    then markdown=true; fi
+  if $env_label; then 
+    label=true
+    markdown=false
+  elif $env_md; then
+    label=false
+    markdown=true
+  fi
+
+  if $sh_label; then
+    label=true
+    markdown=false
+  elif $sh_md; then
+    label=false
+    markdown=true
+  fi
 
   local status=0
 
