@@ -84,7 +84,7 @@ function gso() {
   if $markdown; then
     echo "<pre>" >&2
     "$@" | sed 's|.*|<span style=\"color:green\">&</span>|'
-    status=$?
+    status=${PIPESTATUS[0]}
     if ! $quiet_exit; then
       echo "<span></span>" >&2
       echo "<span style=\"color:red\">[GSO]</span> exit code: $status" >&2
@@ -99,7 +99,7 @@ function gso() {
       # Base case: color stdout green
       "$@" | sed -e "s/^.*$/$(echo -en '\033[32;1m')&$(echo -en '\033[0m')/"
     fi
-    status=$?
+    status=${PIPESTATUS[0]}
 
     if ! $quiet_exit; then
       echo -e "\033[31;1m[GSO]\033[0m exit code: $status" >&2
