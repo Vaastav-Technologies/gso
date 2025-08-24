@@ -1,18 +1,17 @@
-# rse (RedStdErr)
+# gso (GreenStdOut)
 
-`RedStdErr`: Colour stderr red ❤️, to differentiate stdout and stderr, .. and much more ..
+`GreenStdOut`: Colour stdout green 💚, to differentiate stdout and stderr, .. and much more ..
 
-`RedStdErr` is a collection of utilities that helps you distinguish **stderr** from **stdout** in your command outputs. It can either colorize stderr in red ❤️, or prefix output lines with labels (`OUT:` / `ERR:`). This makes it easier to debug scripts and commands where both streams are mixed.
+`GreenStdOut` is a collection of utilities that helps you distinguish **stdout** from **stderr** in your command outputs. It can either colorize stdout in green 💚, or prefix output lines with labels (`OUT:`). This makes it easier to debug scripts and commands where both streams are mixed.
 
 ---
 
 ## Features
 
-* 🔴 **Colorized stderr** by default (stderr shown in red, stdout unchanged)
-* 🏷 **Label mode** with `OUT:` and `ERR:` prefixes (useful if the command already uses colors)
+* 🟢 green **Colorized stdout** by default (stdout shown in green, stderr unchanged)
+* 🏷 **Label mode** with `OUT:` prefix (useful if the command already uses colors)
 * � **Exit code reporting**, always displayed at the end.
 * 🤫 Optionally suppress the exit code line with `-q`
-* 🎨 Markdown export option planned (`-c`, `--copy`) for documentation workflows
 
 ---
 
@@ -22,7 +21,7 @@ Simply source the function in your shell (e.g. `~/.bashrc` or `~/.zshrc`).
 
 ```bash
 # Clone or copy the function definition into your shell config
-source /path/to/rse.sh
+source /path/to/gso.sh
 ```
 
 Then reload your shell or run `source ~/.bashrc`.
@@ -32,53 +31,62 @@ Then reload your shell or run `source ~/.bashrc`.
 ## Usage
 
 ```bash
-rse command args...                 # stderr in red, stdout normal
-rse -h | --help                     # print help
-rse -l | --label command args...    # prefix with OUT:/ERR:, useful when colorised output is not desired but still output differentiation is needed.
-rse -q | --quiet-exit command args  # suppress [RSE] exit code print
-rse -lq | -ql                       # combine both options
+gso command args...                 # stderr in red, stdout normal
+gso -h | --help                     # print help
+gso -l | --label command args...    # prefix with OUT:, useful when colorised output is not desired but still output differentiation is needed.
+gso -q | --quiet-exit command args  # suppress [GSO] exit code print
+gso -lq | -ql                       # combine both options
 ```
 
 ### Examples
 
-#### Normal run (colorized stderr)
+#### Normal run (colorized stdout)
 
 ```shell
-$ rse ls /doesnotexist
+$ gso ls . /doesnotexist
 ```
 ```terminaloutput
-[31;1mls: cannot access '/doesnotexist': No such file or directory[0m
-[RSE] exit code: 2
+[32;1mcurrent directory contents[0m
+ls: cannot access '/doesnotexist': No such file or directory
+[GSO] exit code: 2
 ```
 
 #### Label mode
 
 ```shell
-$ rse -l ls /doesnotexist
+$ gso -l ls . /doesnotexist
 ```
 ```terminaloutput
-ERR: ls: cannot access '/doesnotexist': No such file or directory
-[RSE] exit code: 2
+OUT: current directory contents
+ls: cannot access '/doesnotexist': No such file or directory
+[GSO] exit code: 2
+```
+
+#### Markdown mode
+
+```shell
+$ gso -m ls . /doesnotexist
+```
+```terminaloutput
+<pre>
+<span style="color:green">current directory contents</span>
+ls: cannot access '/doesnotexist': No such file or directory
+<span style="color:red">[GSO]</span> exit code: 0
+</pre>
 ```
 
 #### Quiet exit
 
 ```shell
-$ rse -q ls /doesnotexist
+$ gso -q ls . /doesnotexist
 ```
 ```terminaloutput
-[31;1mls: cannot access '/doesnotexist': No such file or directory[0m
+[32;1current directory contents[0m
+ls: cannot access '/doesnotexist': No such file or directory
 # (exit code still returned, just not printed)
 $ echo $?
 2
 ```
-
----
-
-## Planned Features
-
-* `--markdown` or `-c, --copy`: emit Markdown-friendly colored HTML output for documentation (e.g. GitHub, MkDocs, Obsidian)
-* Packaged distribution (Homebrew / PyPI wrapper) for easy install
 
 ---
 
