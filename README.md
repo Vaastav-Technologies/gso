@@ -93,3 +93,7 @@ $ echo $?
 ## License
 
 [MIT License](./LICENSE)
+
+## Contributing
+
+Check our [contribution guide](./CONTRIBUTING.md).
