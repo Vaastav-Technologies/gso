@@ -11,7 +11,10 @@ function _gso() {
 
   if $markdown; then
     echo "<pre>" >&2
-    "$@" | sed 's|.*|<span style=\"color:green\">&</span>|'
+    "$@" | sed -e 's/&/\&amp;/g' \
+            -e 's/</\&lt;/g' \
+            -e 's/>/\&gt;/g' \
+            -e 's|.*|<span style="color:green">&</span>|'
     status=${PIPESTATUS[0]}
     if ! $quiet_exit; then
       echo "<span style=\"color:red\">[GSO]</span> exit code: $status" >&2
